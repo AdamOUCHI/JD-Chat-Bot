@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JD Sports Chatbot</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #ff8000, #fff200);
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .menu-label {
+      font-size: 12px;
+      margin-left: 5px;
+    }
+
+    .navbar img {
+      height: 45px;
+    }
+
+    .info-menu {
+      position: absolute;
+      top: 60px;
+      left: 10px;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      padding: 10px 0;
+      z-index: 999;
+      border-radius: 8px;
+      width: 230px;
+      display: none;
+    }
+
+    .info-menu a {
+      display: block;
+      padding: 12px 20px;
+      text-decoration: none;
+      color: black;
+      font-size: 14px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-menu a:last-child {
+      border-bottom: none;
+    }
+
+    .info-menu a:hover {
+      background-color: #f5f5f5;
+    }
+
+    .main-container {
+      display: flex;
+      margin-top: 60px;
+      height: calc(100vh - 60px);
+    }
+
+    .sidebar {
+      width: 260px;
+      background-color: white;
+      overflow-y: auto;
+      padding: 10px 0;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h3 {
+      margin: 0;
+      padding: 15px 20px;
+      font-size: 18px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .sidebar a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: #000;
+      font-size: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .sidebar a:hover .arrow {
+      transform: translateX(5px);
+    }
+
+    .arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .chat-box {
+      width: 100%;
+      max-width: 640px;
+      height: 100%;
+      background-color: #f2f2f2;
+      border-radius: 8px;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-message {
+      max-width: 80%;
+      margin: 10px 0;
+      padding: 12px 18px;
+      border-radius: 18px;
+      line-height: 1.4;
+      font-size: 15px;
+      width: fit-content;
+      opacity: 0;
+      animation: fadeIn 0.3s ease-in forwards;
+    }
+
+    .user {
+      background-color: #007bff;
+      color: white;
+      border-bottom-right-radius: 0;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background-color: white;
+      color: black;
+      border-bottom-left-radius: 0;
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bot img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    @keyframes fadeIn {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+@keyframes slideUpFadeIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animated-response {
+  animation: slideUpFadeIn 0.4s ease-out;
+}
+    .chat-input {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    .chat-input button {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .send-button {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .human-button {
+      background-color: black;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="menu-icon" id="menuToggle">☰ <span class="menu-label">Menu</span></div>
+    <a href="https://www.jdsports.fr/" target="_blank">
+      <img src="https://logowik.com/content/uploads/images/jd-sports3682.logowik.com.webp" alt="JD Logo">
+    </a>
+    <div id="infoMenu" class="info-menu">
+      <a href="https://jdsports.fr/">Accueil</a>
+      <a href="https://www.jdsports.fr/page/jd-status/">Programme de fidélité</a>
+      <a href="https://www.jdsports.fr/store-locator/all-stores/">Nos Magasins</a>
+      <a href="https://blog.jdsports.fr/">JD Blog</a>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="sidebar">
+      <h3>Aide & Informations</h3>
+      <a href="https://www.jdsports.fr/customer-service/faqs/">FAQ <span class="arrow">&#8250;</span></a>
+      <a href="https://www.jdsports.fr/customer-service/terms/">Conditions générales de Vente <span class="arrow">&#8250;</span></a>
+      <a href="https://www.jdsports.fr/customer-service/returns/">Retour Produits <span class="arrow">&#8250;</span></a>
+      <a href="https://www.jdsports.fr/customer-service/delivery/">Livraison <span class="arrow">&#8250;</span></a>
+      <a href="https://www.jdsports.fr/customer-service/privacy/">Confidentialité <span class="arrow">&#8250;</span></a>
+    </div>
+
+    <div class="chat-section">
+      <div class="chat-box" id="chatBox">
+        <div class="chat-message bot"><img src="https://logowik.com/content/uploads/images/jd-sports3682.logowik.com.webp" alt="Bot"> Bonjour ! Comment puis-je vous aider aujourd’hui ?</div>
+      </div>
+
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Tapez votre message...">
+        <button class="send-button" onclick="sendMessage()">Envoyer</button>
+        <button class="human-button" onclick="window.open('https://www.jdsports.fr/customer-service/contact/', '_blank')">Parler à un humain</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("menuToggle").addEventListener("click", function() {
+      const menu = document.getElementById("infoMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    });
+
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (message === "") return;
+
+      const chatBox = document.getElementById("chatBox");
+
+      const userDiv = document.createElement("div");
+      userDiv.className = "chat-message user";
+      userDiv.textContent = message;
+      chatBox.appendChild(userDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const loadingDiv = document.createElement("div");
+      loadingDiv.className = "chat-message bot";
+      loadingDiv.innerHTML = '<img src="https://logowik.com/content/uploads/images/jd-sports3682.logowik.com.webp" alt="Bot"> <span>...</span>';
+      chatBox.appendChild(loadingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(() => {
+        const response = getBotResponse(message);
+        animateTyping(loadingDiv, response);
+      }, 2000);
+
+      input.value = "";
+    }
+
+    function getBotResponse(input) {
+      input = input.toLowerCase();
+      if (typeof faqData === "undefined" || !Array.isArray(faqData)) {
+        return "Erreur : la FAQ n'est pas chargée.";
+      }
+      for (const item of faqData) {
+        for (const keyword of item.keywords) {
+          if (input.includes(keyword.toLowerCase())) {
+            return item.response;
+          }
+        }
+      }
+      return "Désolé, je n’ai pas trouvé de réponse à votre question. Cliquez sur \u00ab Parler à un humain \u00bb pour obtenir de l’aide.";
+    }
+
+    function animateTyping(div, text) {
+      let i = 0;
+      div.innerHTML = '<img src="https://logowik.com/content/uploads/images/jd-sports3682.logowik.com.webp" alt="Bot"> <span id="typing"></span>';
+      const span = div.querySelector("#typing");
+      const interval = setInterval(() => {
+        span.textContent += text[i];
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, 15);
+    }
+  </script>
+  <script src="faqData.js"></script>
+</body>
+</html>
